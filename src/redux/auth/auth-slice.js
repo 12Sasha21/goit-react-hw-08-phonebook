@@ -8,13 +8,6 @@ const initialState = {
   loading: false,
 };
 
-// const auth = createReducer(initialState, {
-//   [register.fulfilled]: (_, action) => action.payload,
-//   [logIn.fulfilled]: (_, action) => action.payload,
-//   [logOut.fulfilled]: () => initialState,
-//   [refreshUser.fulfilled]: (_, action) => action.payload,
-// });
-
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -39,7 +32,7 @@ const authSlice = createSlice({
 
     [logOut.pending]: state => void (state.loading = true),
     [logOut.fulfilled]: state => {
-      state.user = { name: '', email: '' };
+      state.user = { name: null, email: null };
       state.token = null;
       state.isLogIn = false;
       state.loading = false;
@@ -49,11 +42,10 @@ const authSlice = createSlice({
     [refreshUser.pending]: state => (state.loading = true),
     [refreshUser.fulfilled]: (state, { payload }) => {
       state.user = payload;
-      // state.token = payload.token;
       state.isLogIn = true;
       state.loading = false;
     },
-    [refreshUser.rejected]: state => (state.loading = false),
+    // [refreshUser.rejected]: state => (state.loading = false),
   },
 });
 
