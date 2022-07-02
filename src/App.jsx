@@ -1,4 +1,4 @@
-import { useEffect, lazy } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { refreshUser } from './redux/auth/auth-operations';
 import { getIsFetchingCurrent } from './redux/auth/auth-selectors';
