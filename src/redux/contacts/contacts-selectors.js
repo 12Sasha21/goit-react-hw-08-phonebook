@@ -1,13 +1,13 @@
-import { getFilterValue } from '../filter/filter-selectors';
+// import { getFilterValue } from '../filter/filter-selectors';
 
-export const getContacts = state => state.contacts.items;
+// export const getContacts = state => state.contacts.items;
 
-export const getVisibleContacts = state => {
-  const contacts = getContacts(state);
-  const filter = getFilterValue(state);
+// export const getVisibleContacts = state => {
+//   const contacts = getContacts(state);
+//   const filter = getFilterValue(state);
 
-  return contacts.filter(
-    ({ name, number }) =>
-      name.toLowerCase().includes(filter.toLowerCase())
-  );
-};
+//   return contacts.filter(
+//     ({ name, number }) =>
+//       name.toLowerCase().includes(filter.toLowerCase())
+//   );
+// };

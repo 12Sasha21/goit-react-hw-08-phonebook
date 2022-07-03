@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { register } from '../redux/auth/auth-operations';
+import { useDispatch, useSelector } from 'react-redux';
+import { authOperations } from '../redux/auth';
 
 const styles = {
   form: {
@@ -15,6 +15,8 @@ const styles = {
 
 export default function RegisterView() {
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const loginButton = useSelector(state => state.auth.loginButton);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,24 +36,26 @@ export default function RegisterView() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    dispatch(register({ name, email, password }));
-    setName('');
-    setEmail('');
-    setPassword('');
+    dispatch(authOperations.register({ name, email, password }));
+    if (isLoggedIn) {
+      setName('');
+      setEmail('');
+      setPassword('');
+    }
   };
 
   return (
     <div>
-      <h1>Сторінка реєстрації</h1>
+      <h1>Страница регистрации</h1>
 
       <form onSubmit={handleSubmit} style={styles.form} autoComplete="off">
         <label style={styles.label}>
-          Ім'я
+          Имя
           <input type="text" name="name" value={name} onChange={handleChange} />
         </label>
 
         <label style={styles.label}>
-          Пошта
+          Почта
           <input
             type="email"
             name="email"
@@ -70,7 +74,9 @@ export default function RegisterView() {
           />
         </label>
 
-        <button type="submit">Зареєструватися</button>
+        <button type="submit">
+          {loginButton ? 'регистрирую...' : 'Зарегистрироваться'}
+        </button>
       </form>
     </div>
   );

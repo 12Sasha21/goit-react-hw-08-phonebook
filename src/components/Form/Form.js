@@ -1,18 +1,26 @@
+import contactApi from 'redux/contacts/contacts-operations';
 import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { addContact } from 'redux/contacts/contacts-operations';
-import { getContacts } from 'redux/contacts/contacts-selectors';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './Form.module.css';
 
-export default function SignupForm() {
+const SignupForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-
-  const contacts = useSelector(getContacts);
+  const state = useSelector(state => state.contacts.items);
   const dispatch = useDispatch();
 
-  const handleInputChange = e => {
-    const { name, value } = e.currentTarget;
+  const contact = (state, name) => {
+    const contactsName = state.map(({ name }) => name.toLowerCase());
+
+    if (contactsName.includes(name.toLowerCase())) {
+      return alert(`${name} is already in contacts.`);
+    } else {
+      return dispatch(contactApi.addContact({ name, number }));
+    }
+  };
+
+  const handleChange = evt => {
+    const { name, value } = evt.target;
 
     switch (name) {
       case 'name':
@@ -28,63 +36,50 @@ export default function SignupForm() {
     }
   };
 
-  const handleButtonSubmit = e => {
-    e.preventDefault();
-    contacts.some(
-      contact =>
-        contact.name.toLowerCase() === name.toLowerCase() ||
-        contact.number === number
-    )
-      ? alert(`${name} is already in contacts.`)
-      : dispatch(addContact({ name, number }));
-    reset();
-  };
-
-  const reset = () => {
+  const handleSubmit = evt => {
+    evt.preventDefault();
+    contact(state, name);
     setName('');
     setNumber('');
   };
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <form
-        className={styles.form}
-        autoComplete="off"
-        onSubmit={handleButtonSubmit}
-      >
+      <form className="styles.form" onSubmit={handleSubmit}>
         <label className={styles.form__label}>
           Name
           <input
             className={styles.form__input}
-            autoFocus
             type="text"
             name="name"
-            value={name}
-            onChange={handleInputChange}
             pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
+            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
+            value={name}
+            onChange={handleChange}
           />
         </label>
+
         <label className={styles.form__label}>
           Number
           <input
             className={styles.form__input}
             type="tel"
             name="number"
-            value={number}
-            onChange={handleInputChange}
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
+            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
+            value={number}
+            onChange={handleChange}
           />
         </label>
 
-        <button type="submit" className={styles.form__btn}>
+        <button className={styles.form__btn} type="submit">
           Add contact
         </button>
       </form>
     </div>
   );
-}
+};
+
+export default SignupForm;

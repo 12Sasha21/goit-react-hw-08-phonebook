@@ -1,54 +1,64 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { refreshUser } from './redux/auth/auth-operations';
-import { getIsFetchingCurrent } from './redux/auth/auth-selectors';
-// import SignupForm from './components/Form/Form';
-// import Filter from './components/Filter/Filter';
-// import ContactList from './components/ContactList/ContactList';
-// import { fetchContacts } from 'redux/contacts/contacts-operations';
-
-// import { Header } from './components/Header/Header';
-// import { Footer } from './components/Footer/Footer';
-
-// import PrivateRoute from './Routes/PrivateRoute';
-// import PublicRoute from './Routes/PublicRoute';
-
-import { Switch, Route } from 'react-router-dom';
-import AppBar from './components/AppBar';
-import LoginView from './views/LoginView';
-import HomeView from './views/HomeView';
-import RegisterView from './views/RegisterView';
-import ContactsView from './views/ContactsView';
+import { Switch } from 'react-router-dom';
+import authOperations from './redux/auth/auth-operations';
+import authSelectors from './redux/auth/auth-selectors';
+import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
 import Container from './components/Container';
+import AppBar from './components/AppBar';
+import { Footer } from './components/Footer/Footer';
 import './index.css';
 
-export default function Phonebook() {
+const HomeView = lazy(() => import('./views/HomeView'));
+const RegisterView = lazy(() => import('./views/RegisterView'));
+const LoginView = lazy(() => import('./views/LoginView'));
+const ContactsView = lazy(() => import('./views/ContactsView'));
+
+const App = () => {
   const dispatch = useDispatch();
-  const isFetchingCurrentUser = useSelector(getIsFetchingCurrent);
+  const isFetchingCurrentUser = useSelector(authSelectors.getIsFetchingCurrent);
 
   useEffect(() => {
-    dispatch(refreshUser());
+    dispatch(authOperations.fetchCurrentUser());
   }, [dispatch]);
 
   return (
-    !isFetchingCurrentUser && (
-      <Container>
-        <AppBar />
-        <Switch>
-          <Route exact path="/" component={HomeView} />
-          <Route path="/register" component={RegisterView} />
-          <Route path="/login" component={LoginView} />
-          <Route path="/contacts" component={ContactsView} />
-        </Switch>
-      </Container>
-    )
-    // <div className="container">
-    //   <h1 className="visually_hidden">Phonebook</h1>
-    //   <Title title="Phonebook" />
-    //   <SignupForm />
-    //   <Title title="Contacts" />
-    //   <Filter />
-    //   <ContactList />
-    // </div>
+    <div>
+      {isFetchingCurrentUser ? (
+        <h1>Показываем React Skeleton</h1>
+      ) : (
+        <Container>
+          <AppBar />
+          <Suspense fallback={<p>Загружаем...</p>}>
+            <Switch>
+              <PublicRoute exact path="/">
+                <HomeView />
+              </PublicRoute>
+
+              <PublicRoute exact path="/register" restricted>
+                <RegisterView />
+              </PublicRoute>
+
+              <PublicRoute
+                exact
+                path="/login"
+                redirectTo="/contacts"
+                restricted
+              >
+                <LoginView />
+              </PublicRoute>
+
+              <PrivateRoute exact path="/contacts" redirectTo="/login">
+                <ContactsView />
+              </PrivateRoute>
+            </Switch>
+          </Suspense>
+          <Footer />
+        </Container>
+      )}
+    </div>
   );
-}
+};
+
+export default App;

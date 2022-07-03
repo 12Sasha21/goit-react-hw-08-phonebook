@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { logIn } from '../redux/auth/auth-operations';
+import { useDispatch, useSelector } from 'react-redux';
+import { authOperations } from '../redux/auth';
 
 const styles = {
   form: {
@@ -15,6 +15,8 @@ const styles = {
 
 export default function LoginView() {
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const loginButton = useSelector(state => state.auth.loginButton);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,18 +33,20 @@ export default function LoginView() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    dispatch(logIn({ email, password }));
-    setEmail('');
-    setPassword('');
+    dispatch(authOperations.logIn({ email, password }));
+    if (isLoggedIn) {
+      setEmail('');
+      setPassword('');
+    }
   };
 
   return (
     <div>
-      <h1>Сторінка логіна</h1>
+      <h1>Страница логина</h1>
 
       <form onSubmit={handleSubmit} style={styles.form} autoComplete="off">
         <label style={styles.label}>
-          Пошта
+          Почта
           <input
             type="email"
             name="email"
@@ -61,7 +65,7 @@ export default function LoginView() {
           />
         </label>
 
-        <button type="submit">Увійти</button>
+        <button type="submit">{loginButton ? 'загружаем...' : 'Войти'}</button>
       </form>
     </div>
   );
