@@ -24,7 +24,7 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <div>
+    <>
       {isFetchingCurrentUser ? (
         <h1>Показываем React Skeleton</h1>
       ) : (
@@ -54,10 +54,10 @@ const App = () => {
               </PrivateRoute>
             </Switch>
           </Suspense>
-          <Footer />
+          {/* <Footer /> */}
         </Container>
       )}
-    </div>
+    </>
   );
 };
 
